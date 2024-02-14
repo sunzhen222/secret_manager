@@ -1,6 +1,11 @@
 use serde::{Serialize, Deserialize};
-use serde_json::Result;
+//use serde_json::Result;
 use serde_json::json;
+use anyhow::{Context, Result};
+use std::env;
+use std::fs;
+pub mod secret;
+
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SecretInfo {
@@ -13,8 +18,21 @@ struct PersonalInfo {
     secret_info: Vec<SecretInfo>,
 }
 
+//fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn main() -> Result<()> {
-    // 创建一个 Person 结构体实例
+
+    let args: Vec<String> = env::args().collect();
+
+    let filename = &args[2];
+    let query = &args[1];
+
+    println!("query:{}", query);
+    println!("filename:{}", filename);
+    println!("In file {}", filename);
+
+    let file_content = fs::read(filename)?;
+    secret::get_plain(file_content, "test password".to_string());
+
     let secret_info1 = SecretInfo {
         name: "google".to_string(),
         account: "jy70342".to_string(),
@@ -25,9 +43,6 @@ fn main() -> Result<()> {
         account: "jy70342".to_string(),
         secret: "8262".to_string(),
     };
-    //let personal_info: PersonalInfo = PersonalInfo {
-    //    secret_info: secret_info1,
-    //}
 
     let secret_array = [&secret_info1, &secret_info2];
 
@@ -36,9 +51,6 @@ fn main() -> Result<()> {
 
     let json_array_string = serde_json::to_string(&secret_array)?;
     println!("json_array_string JSON: {}", json_array_string);
-
-    //let json_psn_string = serde_json::to_string(&personal_info1)?;
-    //println!("json_array_string JSON: {}", json_array_string);
 
     let deserialized_info: SecretInfo = serde_json::from_str(&json_string)?;
     println!("Deserialized Person: {:?}", deserialized_info);
