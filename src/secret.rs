@@ -15,23 +15,24 @@ pub fn get_plain(cipher: Vec<u8>, password: String) -> String {
     let key: Vec<u8> = first_half.to_vec();
     let iv: Vec<u8> = second_half[0..16].to_vec();
 
-    let mut ori_data = Vec::new();
-    let mut index = 0;
-    loop {
-        ori_data.push(index);
-        index += 1;
-        if index >= 128 {
-            break;
-        }
-    }
+    //let mut ori_data = Vec::new();
+    //let mut index = 0;
+    //loop {
+    //    ori_data.push(index);
+    //    index += 1;
+    //    if index >= 32 {
+    //        break;
+    //    }
+    //}
+    //let ori_data = "hello".as_bytes();
     let string: String = key.iter().map(|&byte| format!("{:02X}", byte)).collect();
     println!("key={}", string);
     let string: String = iv.iter().map(|&byte| format!("{:02X}", byte)).collect();
     println!("iv={}", string);
 
-    let cipher = encrypt_aes_cbc(&ori_data, &key, &iv);
-    //let string: String = cipher.iter().map(|&byte| format!("{:02X}", byte)).collect();
-    //println!("cipher={}", string);
+    //let cipher = encrypt_aes_cbc(&ori_data, &key, &iv);
+    let string: String = cipher.iter().map(|&byte| format!("{:02X}", byte)).collect();
+    println!("cipher={}", string);
     let plain = decrypt_aes_cbc(&cipher, &key, &iv);
     let string: String = plain.iter().map(|&byte| format!("{:02X}", byte)).collect();
     println!("plain={}", string);
