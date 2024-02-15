@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 //use serde_json::Result;
 use serde_json;
 use serde_json::json;
-//use serde_json::Value;
+use serde_json::Value;
 use anyhow::Result;
 use std::env;
 use std::fs;
@@ -30,14 +30,13 @@ fn main() -> Result<()> {
 
     let secret_info1: SecretInfo = SecretInfo {
         name: "google".to_string(),
-        account: "jy70342".to_string(),
-        secret: "8262".to_string(),
+        account: "jy070342".to_string(),
+        secret: "82621".to_string(),
     };
     edit_secret(secret_info1, filename, "test password".to_string())?;
 
     Ok(())
 }
-
 
 
 fn edit_secret(
@@ -62,8 +61,26 @@ fn edit_secret(
         let encrypt_data = secret::encrypt(json_string, password);
         fs::write(filename, encrypt_data)?;
     } else {
-        let plain_string = secret::decrypt(file_content, "test password".to_string());
+        let plain_string = secret::decrypt(file_content, password.clone());
         println!("plain_string={}", plain_string);
+        let v: Value = serde_json::from_str(&plain_string)?;
+        let secret_info_base = v["secret_info"].to_string();
+        let mut secret_info_vec: Vec<SecretInfo> = serde_json::from_str(&secret_info_base)?;
+
+        //find if the item that has a same name already exists.
+        if let Some(index) = secret_info_vec.iter().position(|x| x.name == secret_info.name) {
+            secret_info_vec.remove(index);
+        } else {
+            println!("not found a same name");
+        }
+        secret_info_vec.push(secret_info);
+        let personal_info = json!({
+            "secret_info": secret_info_vec,
+        });
+        let json_string = serde_json::to_string(&personal_info)?;
+        println!("json_string JSON: {}", json_string);
+        let encrypt_data = secret::encrypt(json_string, password);
+        fs::write(filename, encrypt_data)?;
     }
     Ok(())
 }
