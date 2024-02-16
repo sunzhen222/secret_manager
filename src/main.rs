@@ -9,6 +9,7 @@ use std::env;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
+use std::io;
 pub mod secret;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,14 +35,27 @@ fn main() -> Result<()> {
     if query == "show" {
         print_all_secret(filename, password)?;
     } else if query == "edit"{
-        let secret_info1: SecretInfo = SecretInfo {
-            name: "google".to_string(),
-            account: "jy070342".to_string(),
-            secret: "82621".to_string(),
+        let mut name = String::new();
+        println!("Input name:");
+        io::stdin().read_line(&mut name)?;
+        name = name.trim().to_string();
+        let mut account = String::new();
+        println!("Input account:");
+        io::stdin().read_line(&mut account)?;
+        account = account.trim().to_string();
+        let mut secret = String::new();
+        println!("Input secret:");
+        io::stdin().read_line(&mut secret)?;
+        let secret = secret.trim().to_string();
+        let secret_info: SecretInfo = SecretInfo {
+            name: name,
+            account: account,
+            secret: secret,
         };
-        edit_secret(secret_info1, filename, "test password".to_string())?;
-    }
+        edit_secret(secret_info, filename, password)?;
+    } else if query == "remove"{
 
+    }
     Ok(())
 }
 
