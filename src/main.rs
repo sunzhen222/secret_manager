@@ -82,7 +82,6 @@ fn edit_secret(
             "secret_info": secret_info_vec,
         });
         let json_string = serde_json::to_string(&personal_info)?;
-        println!("json_string JSON: {}", json_string);
         let encrypt_data = secret::encrypt(json_string, password);
         fs::write(filename, encrypt_data)?;
     } else {
@@ -103,7 +102,6 @@ fn edit_secret(
             "secret_info": secret_info_vec,
         });
         let json_string = serde_json::to_string(&personal_info)?;
-        println!("json_string JSON: {}", json_string);
         let encrypt_data = secret::encrypt(json_string, password);
         fs::write(filename, encrypt_data)?;
     }
@@ -155,7 +153,6 @@ fn remove_secret (
         "secret_info": secret_info_vec,
     });
     let json_string = serde_json::to_string(&personal_info)?;
-    println!("json_string JSON: {}", json_string);
     let encrypt_data = secret::encrypt(json_string, password);
     fs::write(filename, encrypt_data)?;
     Ok(())
