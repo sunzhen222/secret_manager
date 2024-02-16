@@ -27,7 +27,6 @@ fn main() -> Result<()> {
 
     println!("query:{}", query);
     println!("filename:{}", filename);
-    println!("In file {}", filename);
 
     println!("Input password:");
     let password = rpassword::read_password().unwrap();
@@ -102,6 +101,13 @@ fn print_all_secret (
     if file_content.len() == 0 {
         return Err(Error::msg("The file is empty."));
     }
-
+    let plain_string = secret::decrypt(file_content, password);
+    println!("{}", &plain_string);
+    let v: Value = serde_json::from_str(&plain_string)?;
+    let secret_info = v["secret_info"].to_string();
+        let secret_info_vec: Vec<SecretInfo> = serde_json::from_str(&secret_info)?;
+    for item in secret_info_vec {
+        println!("{},{},{}", item.name, item.account, item.secret);
+    }
     Ok(())
 }
