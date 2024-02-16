@@ -46,7 +46,7 @@ fn main() -> Result<()> {
         let mut secret = String::new();
         println!("Input secret:");
         io::stdin().read_line(&mut secret)?;
-        let secret = secret.trim().to_string();
+        secret = secret.trim().to_string();
         let secret_info: SecretInfo = SecretInfo {
             name: name,
             account: account,
@@ -54,7 +54,11 @@ fn main() -> Result<()> {
         };
         edit_secret(secret_info, filename, password)?;
     } else if query == "remove"{
-
+        let mut name = String::new();
+        println!("Input name:");
+        io::stdin().read_line(&mut name)?;
+        let name = name.trim().to_string();
+        remove_secret(filename, password, name)?;
     }
     Ok(())
 }
@@ -123,5 +127,36 @@ fn print_all_secret (
     for item in secret_info_vec {
         println!("{},{},{}", item.name, item.account, item.secret);
     }
+    Ok(())
+}
+
+
+fn remove_secret (
+    filename: String,
+    password: String,
+    name: String,
+) -> Result<()> {
+    let file_content = fs::read(&filename)?;
+    if file_content.len() == 0 {
+        return Err(Error::msg("The file is empty."));
+    }
+    let plain_string = secret::decrypt(file_content, password.clone());
+    let v: Value = serde_json::from_str(&plain_string)?;
+    let secret_info = v["secret_info"].to_string();
+    let mut secret_info_vec: Vec<SecretInfo> = serde_json::from_str(&secret_info)?;
+
+    //find if the item that has a same name already exists.
+    if let Some(index) = secret_info_vec.iter().position(|x| x.name == name) {
+        secret_info_vec.remove(index);
+    } else {
+        return Err(Error::msg("not found a same name."));
+    }
+    let personal_info = json!({
+        "secret_info": secret_info_vec,
+    });
+    let json_string = serde_json::to_string(&personal_info)?;
+    println!("json_string JSON: {}", json_string);
+    let encrypt_data = secret::encrypt(json_string, password);
+    fs::write(filename, encrypt_data)?;
     Ok(())
 }
