@@ -1,3 +1,4 @@
+use anyhow::Error;
 use serde::{Serialize, Deserialize};
 //use serde_json::Result;
 use serde_json;
@@ -9,6 +10,7 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 pub mod secret;
+use std::io;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SecretInfo {
@@ -21,19 +23,27 @@ fn main() -> Result<()> {
 
     let args: Vec<String> = env::args().collect();
 
-    let filename = args[2].to_string();
     let query = &args[1];
+    let filename = args[2].to_string();
 
     println!("query:{}", query);
     println!("filename:{}", filename);
     println!("In file {}", filename);
 
-    let secret_info1: SecretInfo = SecretInfo {
-        name: "google".to_string(),
-        account: "jy070342".to_string(),
-        secret: "82621".to_string(),
-    };
-    edit_secret(secret_info1, filename, "test password".to_string())?;
+    let mut password: String = String::new();
+    println!("Input password:");
+    io::stdin().read_line(&mut password)?;
+    println!("password:{}", password);
+    if query == "show" {
+        print_all_secret(filename, password)?;
+    } else if query == "edit"{
+        let secret_info1: SecretInfo = SecretInfo {
+            name: "google".to_string(),
+            account: "jy070342".to_string(),
+            secret: "82621".to_string(),
+        };
+        edit_secret(secret_info1, filename, "test password".to_string())?;
+    }
 
     Ok(())
 }
@@ -82,5 +92,18 @@ fn edit_secret(
         let encrypt_data = secret::encrypt(json_string, password);
         fs::write(filename, encrypt_data)?;
     }
+    Ok(())
+}
+
+
+fn print_all_secret (
+    filename: String,
+    password: String,
+) -> Result<()> {
+    let file_content = fs::read(&filename)?;
+    if file_content.len() == 0 {
+        return Err(Error::msg("The file is empty."));
+    }
+
     Ok(())
 }
