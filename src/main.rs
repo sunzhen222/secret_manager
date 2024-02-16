@@ -10,7 +10,6 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 pub mod secret;
-use std::io;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SecretInfo {
@@ -30,9 +29,8 @@ fn main() -> Result<()> {
     println!("filename:{}", filename);
     println!("In file {}", filename);
 
-    let mut password: String = String::new();
     println!("Input password:");
-    io::stdin().read_line(&mut password)?;
+    let password = rpassword::read_password().unwrap();
     println!("password:{}", password);
     if query == "show" {
         print_all_secret(filename, password)?;
