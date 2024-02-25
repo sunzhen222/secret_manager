@@ -31,34 +31,39 @@ fn main() -> Result<()> {
 
     println!("Input password:");
     let password = rpassword::read_password().unwrap();
-    if query == "show" {
-        print_all_secret(filename, password)?;
-    } else if query == "edit"{
-        let mut name = String::new();
-        println!("Input name:");
-        io::stdin().read_line(&mut name)?;
-        name = name.trim().to_string();
-        let mut account = String::new();
-        println!("Input account:");
-        io::stdin().read_line(&mut account)?;
-        account = account.trim().to_string();
-        let mut secret = String::new();
-        println!("Input secret:");
-        io::stdin().read_line(&mut secret)?;
-        secret = secret.trim().to_string();
-        let secret_info: SecretInfo = SecretInfo {
-            name: name,
-            account: account,
-            secret: secret,
-        };
-        edit_secret(secret_info, filename, password)?;
-    } else if query == "remove"{
-        let mut name = String::new();
-        println!("Input name:");
-        io::stdin().read_line(&mut name)?;
-        let name = name.trim().to_string();
-        remove_secret(filename, password, name)?;
-    }
+    match query.as_str() {
+        "show" => {
+            print_all_secret(filename, password)?;
+        }
+        "edit" => {
+            let mut name = String::new();
+            println!("Input name:");
+            io::stdin().read_line(&mut name)?;
+            name = name.trim().to_string();
+            let mut account = String::new();
+            println!("Input account:");
+            io::stdin().read_line(&mut account)?;
+            account = account.trim().to_string();
+            let mut secret = String::new();
+            println!("Input secret:");
+            io::stdin().read_line(&mut secret)?;
+            secret = secret.trim().to_string();
+            let secret_info: SecretInfo = SecretInfo {
+                name: name,
+                account: account,
+                secret: secret,
+            };
+            edit_secret(secret_info, filename, password)?;
+        }
+        "remove" => {
+            let mut name = String::new();
+            println!("Input name:");
+            io::stdin().read_line(&mut name)?;
+            let name = name.trim().to_string();
+            remove_secret(filename, password, name)?;
+        }
+        _ => ()
+    };
     Ok(())
 }
 
