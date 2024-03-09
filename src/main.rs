@@ -10,7 +10,7 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::io;
-pub mod secret;
+mod secret;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SecretInfo {
